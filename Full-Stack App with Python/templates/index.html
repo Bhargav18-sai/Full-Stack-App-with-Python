@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Todo App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ── Header ── -->
+    <header>
+      <h1>📝 My Todos</h1>
+      <p class="subtitle">Stay organised, one task at a time.</p>
+    </header>
+
+    <!-- ── Add Task Form ── -->
+    <form action="/add" method="POST" class="add-form">
+      <input
+        type="text"
+        name="task"
+        placeholder="What do you need to do?"
+        autocomplete="off"
+        required
+      />
+      <button type="submit">Add</button>
+    </form>
+
+    <!-- ── Filter Tabs ── -->
+    <nav class="filters">
+      <a href="/?filter=all"    class="{% if filter == 'all'    %}active{% endif %}">All</a>
+      <a href="/?filter=active" class="{% if filter == 'active' %}active{% endif %}">Active</a>
+      <a href="/?filter=done"   class="{% if filter == 'done'   %}active{% endif %}">Done</a>
+    </nav>
+
+    <!-- ── Todo List ── -->
+    {% if todos %}
+      <ul class="todo-list">
+        {% for todo in todos %}
+        <li class="todo-item {% if todo.done %}done{% endif %}">
+
+          <!-- Toggle checkbox -->
+          <a href="/toggle/{{ todo.id }}" class="check-btn" title="Toggle done">
+            {% if todo.done %} ✅ {% else %} ⬜ {% endif %}
+          </a>
+
+          <!-- Task text (click to edit inline) -->
+          <span
+            class="task-text"
+            data-id="{{ todo.id }}"
+            contenteditable="false"
+            title="Double-click to edit"
+          >{{ todo.task }}</span>
+
+          <!-- Edit / Save button -->
+          <button
+            class="edit-btn"
+            data-id="{{ todo.id }}"
+            title="Edit task"
+          >✏️</button>
+
+          <!-- Delete button -->
+          <a href="/delete/{{ todo.id }}" class="delete-btn" title="Delete task"
+             onclick="return confirm('Delete this task?')">🗑️</a>
+
+        </li>
+        {% endfor %}
+      </ul>
+
+      <p class="count">
+        {{ todos | selectattr('done', 'equalto', 0) | list | length }} task(s) remaining
+      </p>
+
+    {% else %}
+      <div class="empty">
+        <p>🎉 No tasks here! Add one above.</p>
+      </div>
+    {% endif %}
+
+  </div><!-- /container -->
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
